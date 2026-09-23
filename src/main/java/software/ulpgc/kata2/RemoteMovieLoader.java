@@ -1,17 +1,22 @@
-package software.ulpgc.kata2.io;
-
-import software.ulpgc.kata2.model.Movie;
+package software.ulpgc.kata2;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
 
 public class RemoteMovieLoader implements MovieLoader {
+
+    private final Function<String, Movie> deserialize;
+
+    public RemoteMovieLoader(Function<String,Movie> deserialize) {
+        this.deserialize = deserialize;
+    }
+
     @Override
     public List<Movie> loadAll() {
         try {
@@ -36,15 +41,18 @@ public class RemoteMovieLoader implements MovieLoader {
     }
 
     private List<Movie> loadFrom(BufferedReader reader) throws IOException {
-        MovieParser parser = new TSVMovieParser();
         List<Movie> list = new ArrayList<>();
         reader.readLine();
         while (true){
             String line = reader.readLine();
             if (line == null) break;
-            list.add(parser.parse(line));
+            list.add(toMovie(line));
         }
         return list;
+    }
+
+    private Movie toMovie(String line) {
+        return deserialize.apply(line);
     }
 
     private BufferedReader toReader(InputStream is) {

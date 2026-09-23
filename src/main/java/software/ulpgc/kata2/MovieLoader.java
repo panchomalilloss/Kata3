@@ -1,6 +1,4 @@
-package software.ulpgc.kata2.io;
-
-import software.ulpgc.kata2.model.Movie;
+package software.ulpgc.kata2;
 
 import java.util.List;
 
